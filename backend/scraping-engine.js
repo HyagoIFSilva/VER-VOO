@@ -307,7 +307,7 @@ export async function runScrapingCycle() {
   for (const flight of flights) {
     // 1. Get previous price to compare drops
     const lastRecord = await dbGet(
-      `SELECT price, score FROM prices WHERE direction = ? AND origin = ? AND destination = ? ORDER BY scraped_at DESC LIMIT 1`,
+      `SELECT price, score FROM prices WHERE direction = ? AND origin = ? AND destination = ? ORDER BY id DESC LIMIT 1`,
       [flight.direction, flight.origin, flight.destination]
     );
 

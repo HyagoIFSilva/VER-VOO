@@ -139,8 +139,15 @@ export const initDb = async () => {
         const date = new Date();
         date.setDate(date.getDate() - day);
         date.setHours(hour, 0, 0, 0);
-        // Format to SQLite compatible datetime string
-        const dateStr = date.toISOString().replace('T', ' ').substring(0, 19);
+        
+        // Format to SQLite compatible local datetime string: YYYY-MM-DD HH:MM:SS
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const dayOfMonth = String(date.getDate()).padStart(2, '0');
+        const hh = String(date.getHours()).padStart(2, '0');
+        const mm = String(date.getMinutes()).padStart(2, '0');
+        const ss = String(date.getSeconds()).padStart(2, '0');
+        const dateStr = `${year}-${month}-${dayOfMonth} ${hh}:${mm}:${ss}`;
 
         // IDA (SAO -> FLN)
         for (const depDate of DATES_IDA) {

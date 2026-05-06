@@ -92,8 +92,8 @@ app.get('/api/prices', async (req, res) => {
 app.get('/api/analytics', async (req, res) => {
   try {
     // 1. Core aggregates
-    const currentPriceIda = await dbGet(`SELECT * FROM prices WHERE direction = 'IDA' ORDER BY scraped_at DESC LIMIT 1`);
-    const currentPriceVolta = await dbGet(`SELECT * FROM prices WHERE direction = 'VOLTA' ORDER BY scraped_at DESC LIMIT 1`);
+    const currentPriceIda = await dbGet(`SELECT * FROM prices WHERE direction = 'IDA' ORDER BY id DESC LIMIT 1`);
+    const currentPriceVolta = await dbGet(`SELECT * FROM prices WHERE direction = 'VOLTA' ORDER BY id DESC LIMIT 1`);
     
     const minIda = await dbGet(`SELECT MIN(price) as minPrice, MAX(price) as maxPrice, AVG(price) as avgPrice FROM prices WHERE direction = 'IDA'`);
     const minVolta = await dbGet(`SELECT MIN(price) as minPrice, MAX(price) as maxPrice, AVG(price) as avgPrice FROM prices WHERE direction = 'VOLTA'`);
@@ -143,7 +143,8 @@ app.get('/api/analytics', async (req, res) => {
           avg: Math.round(minIda.avgPrice || 0),
           airline: currentPriceIda?.airline || 'LATAM',
           origin: currentPriceIda?.origin || 'CGH',
-          recommendation: currentPriceIda?.recommendation || 'AGUARDAR'
+          recommendation: currentPriceIda?.recommendation || 'AGUARDAR',
+          departureDate: currentPriceIda?.departure_date || null
         },
         volta: {
           current: currentPriceVolta?.price || null,
@@ -153,7 +154,8 @@ app.get('/api/analytics', async (req, res) => {
           avg: Math.round(minVolta.avgPrice || 0),
           airline: currentPriceVolta?.airline || 'LATAM',
           origin: currentPriceVolta?.origin || 'CGH',
-          recommendation: currentPriceVolta?.recommendation || 'AGUARDAR'
+          recommendation: currentPriceVolta?.recommendation || 'AGUARDAR',
+          departureDate: currentPriceVolta?.departure_date || null
         }
       },
       timeline: timelineData,

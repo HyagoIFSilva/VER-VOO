@@ -12,6 +12,7 @@ interface RouteSummary {
   airline: string;
   origin: string;
   recommendation: string;
+  departureDate?: string | null;
 }
 
 interface DashboardProps {
@@ -139,7 +140,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   IDA
                 </span>
                 <span className="text-xs text-trading-muted flex items-center">
-                  <Calendar className="h-3 w-3 mr-1" /> 12/06/2026
+                  <Calendar className="h-3 w-3 mr-1" /> {summary.ida.departureDate || '12/06/2026'}
                 </span>
               </div>
               <div className="text-right text-xs text-trading-muted font-mono">
@@ -222,7 +223,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   VOLTA
                 </span>
                 <span className="text-xs text-trading-muted flex items-center">
-                  <Calendar className="h-3 w-3 mr-1" /> 26/06/2026
+                  <Calendar className="h-3 w-3 mr-1" /> {summary.volta.departureDate || '26/06/2026'}
                 </span>
               </div>
               <div className="text-right text-xs text-trading-muted font-mono">
