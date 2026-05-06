@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import axios from 'axios';
 
 import { initDb, dbAll, dbRun, dbGet } from './db.js';
 import { runScrapingCycle } from './scraping-engine.js';
@@ -314,6 +315,57 @@ app.post('/api/settings', async (req, res) => {
     }
 
     res.json({ success: true, message: 'Configurações salvas com sucesso.' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// API: Test Webhook Connection (Bypasses filters to prove delivery immediately)
+app.post('/api/settings/test', async (req, res) => {
+  try {
+    const { discord_webhook, telegram_token, telegram_chat_id } = req.body;
+    
+    const discordUrl = discord_webhook || process.env.DISCORD_WEBHOOK_URL;
+    const telegramToken = telegram_token || process.env.TELEGRAM_BOT_TOKEN;
+    const telegramChatId = telegram_chat_id || process.env.TELEGRAM_CHAT_ID;
+
+    let discordSent = false;
+    let telegramSent = false;
+
+    // Send Discord test message
+    if (discordUrl) {
+      await axios.post(discordUrl, {
+        embeds: [{
+          title: '🔄 TESTE DE CONEXÃO - RADAR DE OPORTUNIDADES ✈️',
+          description: 'Parabéns! Se você está lendo esta mensagem, o seu webhook do Discord está **100% configurado e ativo**.\n\n' +
+                      'O sistema agora monitorará as rotas nos bastidores e alertará aqui quando houver quedas tarifárias reais baseadas em suas regras de negócio!',
+          color: 3447003, // Blue
+          fields: [
+            { name: 'Canal de Teste', value: 'Discord Webhook', inline: true },
+            { name: 'Status', value: '🟢 Operando em Alta Performance', inline: true }
+          ],
+          timestamp: new Date().toISOString()
+        }]
+      });
+      discordSent = true;
+    }
+
+    // Send Telegram test message
+    if (telegramToken && telegramChatId) {
+      const telegramUrl = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
+      await axios.post(telegramUrl, {
+        chat_id: telegramChatId,
+        text: `✈️ *TESTE DE CONEXÃO - RADAR DE OPORTUNIDADES*\n\nParabéns! Se seu bot do Telegram está ativo, o envio está operando com sucesso.`,
+        parse_mode: 'Markdown'
+      });
+      telegramSent = true;
+    }
+
+    res.json({
+      success: true,
+      message: 'Alerta de teste disparado com sucesso.',
+      channels: { discord: discordSent, telegram: telegramSent }
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

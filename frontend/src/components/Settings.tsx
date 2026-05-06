@@ -70,24 +70,23 @@ const Settings: React.FC<SettingsProps> = ({ serverStatus, onRefreshStatus }) =>
     setTestResult(null);
 
     try {
-      // Direct trigger mock event to save and alert immediately
-      await axios.post('http://localhost:5000/api/settings', {
+      // Trigger the explicit bypass-filters test endpoint
+      const response = await axios.post('http://localhost:5000/api/settings/test', {
         discord_webhook: discordWebhook,
         telegram_token: telegramToken,
         telegram_chat_id: telegramChatId
       });
 
-      // Force a simulated high score flight event immediately
-      await axios.post('http://localhost:5000/api/scrape/trigger');
-
-      setTestResult({
-        type: 'success',
-        text: '🔥 Alerta de Teste disparado! Verifique seu canal do Discord ou Telegram.'
-      });
+      if (response.data.success) {
+        setTestResult({
+          type: 'success',
+          text: '🔥 Alerta de Teste disparado! Verifique seu canal do Discord ou Telegram.'
+        });
+      }
     } catch (error: any) {
       setTestResult({
         type: 'error',
-        text: `Erro ao disparar diagnóstico: ${error.message}`
+        text: `Erro ao disparar diagnóstico: ${error.response?.data?.error || error.message}`
       });
     } finally {
       setIsTesting(false);
