@@ -37,30 +37,37 @@ const LiveActivity: React.FC<LiveActivityProps> = ({ lastScrapedAt, isScraping }
 
   // Monitor isScraping changes to push realistic execution logs
   useEffect(() => {
+    const timeouts: any[] = [];
+
     if (isScraping) {
       addLog('🚀 Disparando ciclo manual de raspagem aérea...', 'info');
       
-      setTimeout(() => {
+      const t1 = setTimeout(() => {
         addLog('🌐 Inicializando Playwright Chromium em modo headless...', 'info');
         addLog('🛡️ Injetando camuflagem de evasão anti-bot (Stealth Headers / Custom UA)...', 'info');
       }, 500);
 
-      setTimeout(() => {
-        addLog('🔍 Consultando voos de ida SAO (CGH, GRU, VCP) para FLN (12/06/2026)...', 'scrape');
-      }, 1500);
+      const t2 = setTimeout(() => {
+        addLog('🔍 Consultando voos de ida SAO (CGH, GRU, VCP) para FLN (Faixa 09/06 a 13/06)...', 'scrape');
+      }, 1200);
 
-      setTimeout(() => {
-        addLog('🔍 Consultando voos de volta FLN para SAO (CGH, GRU, VCP) (26/06/2026)...', 'scrape');
-      }, 3000);
+      const t3 = setTimeout(() => {
+        addLog('🔍 Consultando voos de volta FLN para SAO (CGH, GRU, VCP) (Faixa 23/06 a 27/06)...', 'scrape');
+      }, 2000);
 
-      setTimeout(() => {
+      const t4 = setTimeout(() => {
         addLog('📊 Processando e filtrando as passagens obtidas pelas APIs...', 'info');
-      }, 4500);
+      }, 2700);
 
+      timeouts.push(t1, t2, t3, t4);
     } else if (logs.length > 5) {
       addLog('✅ Ciclo concluído. Dados consolidados e indexados com sucesso.', 'success');
       addLog(`⏰ Próxima verificação agendada. Última atualização: ${lastScrapedAt || 'Agora'}`, 'info');
     }
+
+    return () => {
+      timeouts.forEach(clearTimeout);
+    };
   }, [isScraping]);
 
   useEffect(() => {

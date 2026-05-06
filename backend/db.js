@@ -110,6 +110,17 @@ export const initDb = async () => {
     console.log('⚙️ Configurações iniciais inseridas no banco de dados (sincronizadas com .env).');
   }
 
+  // Load and sync database settings with process.env on boot
+  const dbDiscord = await dbGet(`SELECT value FROM settings WHERE key = 'discord_webhook'`);
+  const dbTelegramToken = await dbGet(`SELECT value FROM settings WHERE key = 'telegram_token'`);
+  const dbTelegramChatId = await dbGet(`SELECT value FROM settings WHERE key = 'telegram_chat_id'`);
+
+  if (dbDiscord?.value) process.env.DISCORD_WEBHOOK_URL = dbDiscord.value;
+  if (dbTelegramToken?.value) process.env.TELEGRAM_BOT_TOKEN = dbTelegramToken.value;
+  if (dbTelegramChatId?.value) process.env.TELEGRAM_CHAT_ID = dbTelegramChatId.value;
+  
+  console.log('🔄 Variáveis de ambiente (Discord/Telegram) re-sincronizadas com o banco SQLite.');
+
   // Auto Seeding if Empty
   const pricesCount = await dbGet(`SELECT COUNT(*) as count FROM prices`);
   if (pricesCount.count === 0) {

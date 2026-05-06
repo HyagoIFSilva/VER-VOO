@@ -1,1 +1,19 @@
-node_modules
+# Dependency folders
+node_modules/
+
+# Environment configurations (Do not leak secrets or webhooks to git)
+.env
+.env.local
+
+# Local SQLite databases
+*.sqlite
+*.sqlite-journal
+
+# Compiled frontend builds
+dist/
+build/
+.vite/
+
+# Dynamic screenshots and proof images (prevents git commit pollution)
+backend/public/screenshots/*.png
+!backend/public/screenshots/.gitkeep

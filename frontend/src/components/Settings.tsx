@@ -22,10 +22,11 @@ const Settings: React.FC<SettingsProps> = ({ serverStatus, onRefreshStatus }) =>
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/prices?limit=1');
-        // Setting state placeholders. Real settings stored securely in SQLite settings table.
-        // We can fetch from database configuration if needed. To keep it robust, we save securely on submit.
-      } catch (err) {
+        const response = await axios.get('http://localhost:5000/api/settings');
+        setDiscordWebhook(response.data.discord_webhook || '');
+        setTelegramToken(response.data.telegram_token || '');
+        setTelegramChatId(response.data.telegram_chat_id || '');
+      } catch (err: any) {
         console.warn('⚠️ Falha ao ler configurações iniciais:', err.message);
       }
     };

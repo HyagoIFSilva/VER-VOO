@@ -262,8 +262,31 @@ app.get('/api/best-combination', async (req, res) => {
 app.post('/api/scrape/trigger', async (req, res) => {
   try {
     console.log('⚡ Solicitação manual de varredura recebida.');
+    
+    // Add realistic delay for mock to make console feel alive and satisfying
+    if (process.env.MOCK_SCRAPING === 'true') {
+      await new Promise(resolve => setTimeout(resolve, 3000));
+    }
+
     const results = await runScrapingCycle();
     res.json({ success: true, count: results.length, data: results });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// API: Retrieve active configuration settings
+app.get('/api/settings', async (req, res) => {
+  try {
+    const discordSetting = await dbGet(`SELECT value FROM settings WHERE key = 'discord_webhook'`);
+    const telegramSetting = await dbGet(`SELECT value FROM settings WHERE key = 'telegram_token'`);
+    const telegramChatSetting = await dbGet(`SELECT value FROM settings WHERE key = 'telegram_chat_id'`);
+
+    res.json({
+      discord_webhook: discordSetting?.value || '',
+      telegram_token: telegramSetting?.value || '',
+      telegram_chat_id: telegramChatSetting?.value || ''
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
